@@ -1,0 +1,135 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+string nameData[30] = {"huhaiyang","zhanghanwen","wangyixuan","liziqian","yanhan","hezheng","guxuxiang",
+"ruxinglong","linhailong","mashuai","tianhaopeng","wangzihan","hujiahui","dingling","lisihan",
+"songxinjie","wangyingchun","zhaojialu","zhangjiayu","lixuhang","fuxuanwei","gaocunyuan","zhukangsheng",
+"chenzhizhong","jiayubin","gaodan","cuiyidong","lubenwei","suixiaochuan","laoba"};
+
+class Hash {
+private:
+	string hashTable[30];
+	bool isFull[30];
+	int conflictNum;
+public:
+	Hash() {
+		for (int i = 0; i < 30; i++) {
+			isFull[i] = false;
+		}
+		conflictNum = 0;
+	}
+
+	void hashFunc3() {
+		for (int i = 0; i < 30; i++) {
+			hashTable[preHashFunc3(getKey(nameData[i]))] = nameData[i];
+		}
+	}
+
+	int preHashFunc3(int i) {
+		i = i * i;
+		i = i / 1000;
+		int result = i % 30;
+		while (isFull[result]) {
+			result++;
+			if(result > 30){
+				result = 0;
+			}
+			conflictNum++;
+		}
+		isFull[result] = true;
+		return result;
+	}
+
+	void hashFunc2() {
+		for (int i = 0; i < 30; i++) {
+			hashTable[i] = nameData[i];
+		}
+	}
+
+	void hashFunc1() {
+		for (int i = 0; i < 30; i++) {
+			hashTable[preHashFunc1(getKey(nameData[i]))] = nameData[i];
+		}
+	}
+
+	int getKey(string s) {
+		char *dst = new char[255];
+		int i; 
+		int sum = 0;
+		for (i = 0; i <= s.length(); i++) {
+			dst[i]=s[i]; 
+		}
+		dst[i] = '\0';
+		for (int j = 0;dst[j] != '\0'; j++) {
+			sum = sum + (int)dst[j];
+		}
+		return sum;
+	}
+
+	int preHashFunc1(int i) {
+		int result = i % 30;
+		while (isFull[result]) {
+			result++;
+			if(result > 30){
+				result = 0;
+			}
+			conflictNum++;
+		}
+		isFull[result] = true;
+		return result;
+	}
+
+	void reFull() {
+		for (int i = 0; i < 30; i++) {
+			isFull[i] = false;
+		}
+	}
+
+	void printHash() {
+		for (int i = 0; i < 30; i++) {
+			cout << i + 1 << "." << hashTable[i] << endl;
+		}
+	}
+
+	void resetCNum() {
+		conflictNum = 0;
+	}
+
+	void printCRank() {
+		cout << "地址冲突率为：" << (float)(conflictNum) / (30 + conflictNum) << endl;
+	}
+
+};
+
+int main() {
+	Hash hash = Hash();
+
+	cout << "除留余数法" << endl;
+	hash.resetCNum();
+	hash.reFull();
+	hash.hashFunc1();
+	hash.printHash();
+	hash.printCRank();
+	cout << endl;
+
+	cout << "直接定址法" << endl;
+	hash.resetCNum();
+	hash.reFull();
+	hash.hashFunc2();
+	hash.printHash();
+	hash.printCRank();
+	cout << endl;
+	
+	cout << "平方取中法" << endl;
+	hash.resetCNum();
+	hash.reFull();
+	hash.hashFunc3();
+	hash.printHash();
+	hash.printCRank();
+	cout << endl;
+
+	while (true);
+	return 0;
+}
