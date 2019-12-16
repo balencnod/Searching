@@ -1,0 +1,202 @@
+#include <iostream>
+#include <math.h>
+
+using namespace std;
+
+struct node {
+	int data;
+	node* left = nullptr;
+	node* right = nullptr;
+	node* father = nullptr;
+};
+
+class BiTree {
+
+private:
+
+	int data[100];
+	int index;
+	bool b;
+	node* p; node* q; node* r;
+	int total;
+
+public:
+
+	node* root;
+
+	BiTree() {
+
+		for (int i = 0; i < 100; i++) {
+			data[i] = -1;
+		}
+
+		index = 1;
+		
+		bool b = false;
+
+		total = 0;
+
+		char s[100];
+		int bf = 0; int la = 0;
+		int fac = 0; int sum = 0;
+		int index = 0;
+		cout << "输入数据:";
+		cin >> s;
+		while ((getchar()) != '\n');
+		for (int j = 0; j < 100; j++) {
+			if (s[la] == ',' || s[la] == '\0') {
+				sum = 0;
+				for (int i = 0; i < la - bf; i++) {
+					fac = (int)(s[bf + i]) - 48;
+					sum = sum + fac * pow(10,(la - bf - 1));
+				}
+				data[index] = sum;
+				index++;
+				la++;
+				bf = la;
+			}
+			else {
+				la++;
+			}
+		}
+
+		for (int i = 0; i < 100; i++) {
+			if (data[i] == -1) {
+				break;
+			}
+			total++;
+		}
+
+		ascSort(total);
+
+		p = new node;
+		root = p;
+		
+
+		createTree(root, 0, total - 1, nullptr);
+
+	}
+
+	void ascSort(int n) {
+		int exchange;
+
+
+		int tmp[100];
+		for(int i = 0;i < n;i++){  
+			for(int j = 0;j < n-i-1;j++){  
+				if(data[j] > data[j+1]){  
+					int t = data[j];  
+					data[j] = data[j+1];  
+					data[j+1] = t;  
+				}  
+			}  
+		}     
+	}
+
+	void createTree(node* t, int min, int max, node* father) {
+		p = t;
+		int toNum = getMidNum(min, max);
+		p->data = data[toNum];
+		p->father = father;
+ 		if (toNum > min) {
+			p->left = new node;
+			createTree(p->left, min, toNum - 1, p);
+		}
+		else { p->left = nullptr; }
+		if(toNum < max){
+			p->right = new node;
+			createTree(p->right, toNum + 1, max, p);
+		}
+		else { p->right = nullptr; }
+		p = p->father;
+	}
+
+	int getMidNum(int min, int max) {
+		return (min + max) / 2;
+	}
+
+	void searchResult(node* t, int i) {
+		search(t, i);
+		if (b) {
+			cout << "成功" << endl;
+		}
+		else {
+			cout << "失败" << endl;
+		}
+
+	}
+
+	void search(node* t, int i) {
+		p = t;
+		if (p->data == i) {
+			b = true;
+		}
+		if (p->left != nullptr) {
+			search(p->left, i);
+		}
+		if(p->right != nullptr){
+			search(p->right, i);
+		}
+		p = p->father;
+	}
+
+	void Trvs(node* t) {
+		p = t;
+		cout << p->data << " ";
+		if (p->left != nullptr) {
+			Trvs(p->left);
+		}
+		if(p->right != nullptr){
+			Trvs(p->right);
+		}
+		p = p->father;
+	}
+
+	void insertE(int i) {
+		data[total] = i;
+		total++;
+		ascSort(total);
+		p = new node;
+		root = p;
+		createTree(root, 0, total - 1, nullptr);
+	}
+
+	void deleteE(int i) {
+		for (int j = 0; j < total - 1; j++) {
+			if (data[j] == i) {
+				data[j] = data[total - 1];
+				data[total - 1] = -1;
+				total--;
+			}
+		}
+		ascSort(total);
+		p = new node;
+		root = p;
+		createTree(root, 0, total - 1, nullptr);
+	}
+
+};
+
+
+int main() {
+	int i;
+	BiTree biTree = BiTree();
+	biTree.Trvs(biTree.root);
+	cout << endl;
+	cout << "输入查找的数据:";
+	cin >> i;
+	biTree.searchResult(biTree.root, i);
+	cout << "输入插入的数据:";
+	cin >> i;
+	biTree.insertE(i);
+	biTree.Trvs(biTree.root);
+	cout << endl;
+	cout << "输入删除的数据:";
+	cin >> i;
+	biTree.deleteE(i);
+	biTree.Trvs(biTree.root);
+	cout << endl;
+
+	while (true);
+	return 0;
+}
